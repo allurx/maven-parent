@@ -19,5 +19,6 @@ jobs:
       contents: write
       actions: read
     uses: allurx/allurx-build/.github/workflows/maven-central-release.yml@main
+    secrets: inherit
     with:
       tag: ${{ github.ref_name }}
