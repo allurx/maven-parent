@@ -1,23 +1,25 @@
 # maven-parent
 
-公共 Maven 父 POM，坐标为 `io.allurx:maven-parent`，统一 Java 构建和发布配置，不管理业务依赖。
+公共 Maven 父 POM `io.allurx:maven-parent`，统一 Java 构建和发布配置。
 
-默认使用 Java 25、UTF-8 和固定的插件版本。`release` profile 提供 sources、Javadoc、GPG 签名和 Maven Central 发布配置；具体设置见 [pom.xml](pom.xml)。
+- 默认编译目标为 Java 25，使用 UTF-8 编码和固定插件版本。
+- 显式启用 `release` profile 后，为 Java 模块附加 sources、Javadoc，并启用 GPG 签名和 Maven Central 发布配置。
+- 本工程采用 `pom` packaging，只发布 POM 及其签名、校验文件。完整配置见 [pom.xml](pom.xml)。
 
 ## 使用
 
-以下版本发布到 Maven Central 后，可通过 parent 继承：
+在项目的 `pom.xml` 中声明父 POM，将 `LATEST_VERSION` 替换为链接中的已发布版本：
 
-```xml
-<parent>
-    <groupId>io.allurx</groupId>
-    <artifactId>maven-parent</artifactId>
-    <version>1.0.0</version>
-    <relativePath/>
-</parent>
-```
+<pre><code>&lt;parent&gt;
+    &lt;groupId&gt;io.allurx&lt;/groupId&gt;
+    &lt;artifactId&gt;maven-parent&lt;/artifactId&gt;
+    &lt;version&gt;<a href="https://central.sonatype.com/artifact/io.allurx/maven-parent">LATEST_VERSION</a>&lt;/version&gt;
+    &lt;relativePath/&gt;
+&lt;/parent&gt;</code></pre>
 
-使用方应声明自己的项目坐标及 `name`、`description`、`url`、`scm`、`issueManagement`，避免误用父 POM 的元数据。插件版本可通过同名属性覆盖。
+依赖管理、模块和 annotation processor 由使用方声明。设置自己的项目坐标及 `name`、`description`、`url`、`scm`、`issueManagement`，避免继承父 POM 的项目元数据。
+
+通过 `maven.compiler.release` 覆盖编译目标，通过对应的 `*.version` 属性覆盖插件版本。
 
 ## 本地验证
 
@@ -28,10 +30,10 @@ mvn -B -ntp clean verify
 mvn -B -ntp -Prelease -Dgpg.skip=true clean verify
 ```
 
-本工程是纯父 POM，上述命令只验证其构建生命周期；第二条跳过签名且不上传制品。使用方的 Java 编译、测试和打包行为需单独验证。
+两条命令均不上传制品；第二条启用 `release` profile 并跳过签名。验证仅覆盖父 POM 生命周期，Java 模块的编译、测试和打包需在使用方验证。
 
-## CI/CD
+CI 与发布使用 [allurx-build](https://github.com/allurx/allurx-build)。
 
-[CI](.github/workflows/ci.yml) 执行构建验证；[Release](.github/workflows/release.yml) 在推送 `v*` 标签时发布。本工程只发布 POM 及其签名、校验文件，GitHub Release 说明自动生成。
+## 许可证
 
-维护约定见 [AGENTS.md](AGENTS.md)。采用 Apache License 2.0，见 [LICENSE.txt](LICENSE.txt)。
+[Apache License 2.0](LICENSE.txt)。
